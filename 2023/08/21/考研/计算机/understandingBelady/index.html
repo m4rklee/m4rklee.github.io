@@ -20,17 +20,19 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"m4rklee.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。   案例 上图对比了同一个页访问队列（[d, c, b, a, d, c, e, d, c, b, a, e]）在分配三个页框和四个页框的情况下，每个时刻的页框">
+    <meta name="description" content="Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。   案例  上图对比了同一个页访问队列（[d, c, b, a, d, c, e, d, c, b, a, e]）在分配三个页框和四个页框的情况下，每个时刻的页">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从Belady现象看FIFO与LRU算法">
 <meta property="og:url" content="https://m4rklee.github.io/2023/08/21/%E8%80%83%E7%A0%94/%E8%AE%A1%E7%AE%97%E6%9C%BA/understandingBelady/index.html">
 <meta property="og:site_name" content="MarkLee&#39;s Space">
-<meta property="og:description" content="Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。   案例 上图对比了同一个页访问队列（[d, c, b, a, d, c, e, d, c, b, a, e]）在分配三个页框和四个页框的情况下，每个时刻的页框">
+<meta property="og:description" content="Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。   案例  上图对比了同一个页访问队列（[d, c, b, a, d, c, e, d, c, b, a, e]）在分配三个页框和四个页框的情况下，每个时刻的页">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://m4rklee.github.io/images/cs/Belady.jpg">
 <meta property="article:published_time" content="2023-08-21T07:52:28.000Z">
-<meta property="article:modified_time" content="2023-08-22T15:04:31.514Z">
+<meta property="article:modified_time" content="2023-08-22T15:06:38.857Z">
 <meta property="article:author" content="Lee">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://m4rklee.github.io/images/cs/Belady.jpg">
 
 
 <link rel="canonical" href="https://m4rklee.github.io/2023/08/21/%E8%80%83%E7%A0%94/%E8%AE%A1%E7%AE%97%E6%9C%BA/understandingBelady/">
@@ -194,7 +196,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-08-22 23:04:31" itemprop="dateModified" datetime="2023-08-22T23:04:31+08:00">2023-08-22</time>
+      <time title="Modified: 2023-08-22 23:06:38" itemprop="dateModified" datetime="2023-08-22T23:06:38+08:00">2023-08-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -224,6 +226,7 @@
 </blockquote>
 <hr>
 <h1>案例</h1>
+<p><a target="_blank" rel="noopener" href="http://nob.cs.ucdavis.edu/classes/ecs150-2008-02/handouts/memory/mm-belady.pdf"><img src="/images/cs/Belady.jpg" alt="Belady现象的案例" title="Belady案例"></a></p>
 <p>上图对比了同一个页访问队列（[d, c, b, a, d, c, e, d, c, b, a, e]）在分配三个页框和四个页框的情况下，每个时刻的页框占用情况、缺页次数和页替换信息。可以看到，在情况A（即分配页框为3，下同）时，一共发生了9次缺页（page fault），而在情况B（分配页框为4，下同）的时候，缺页数则增加到了10次，出现了Belady现象，那么为什么会这样呢？</p>
 <p>不妨来回看一下每个时刻所对应的页框状况。从time0到time3，两种分配方式下的缺页次数是相同的。从time3到time6，对于情况A，缺页数递增，而对于情况B，缺页数保持不变，只在time6时增加了一次。从time7到time11，情况A下，只缺页了2次，而在情况B下，每次访问都要缺页，最终使得缺页数反超。因此不难看出，问题就出现在time3到time6期间。</p>
 <hr>
