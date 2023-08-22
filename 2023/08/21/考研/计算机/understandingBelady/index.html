@@ -20,27 +20,29 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。  案例">
+    <meta name="description" content="Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。   案例  上图对比了同一个页访问队列（[d, c, b, a, d, c, e, d, c, b, a, e]）在分配三个页框和四个页框的情况下，每个时刻的页">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Belady、抖动及FIFO与LRU算法的对比">
+<meta property="og:title" content="从Belady现象看FIFO与LRU算法">
 <meta property="og:url" content="http://example.com/2023/08/21/%E8%80%83%E7%A0%94/%E8%AE%A1%E7%AE%97%E6%9C%BA/understandingBelady/index.html">
 <meta property="og:site_name" content="MarkLee&#39;s Space">
-<meta property="og:description" content="Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。  案例">
+<meta property="og:description" content="Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。   案例  上图对比了同一个页访问队列（[d, c, b, a, d, c, e, d, c, b, a, e]）在分配三个页框和四个页框的情况下，每个时刻的页">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/cs/belady.jpg">
 <meta property="article:published_time" content="2023-08-21T07:52:28.000Z">
-<meta property="article:modified_time" content="2023-08-21T16:02:39.558Z">
+<meta property="article:modified_time" content="2023-08-22T14:22:54.862Z">
 <meta property="article:author" content="Lee">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cs/belady.jpg">
 
 
 <link rel="canonical" href="http://example.com/2023/08/21/%E8%80%83%E7%A0%94/%E8%AE%A1%E7%AE%97%E6%9C%BA/understandingBelady/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2023/08/21/%E8%80%83%E7%A0%94/%E8%AE%A1%E7%AE%97%E6%9C%BA/understandingBelady/","path":"2023/08/21/考研/计算机/understandingBelady/","title":"Belady、抖动及FIFO与LRU算法的对比"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2023/08/21/%E8%80%83%E7%A0%94/%E8%AE%A1%E7%AE%97%E6%9C%BA/understandingBelady/","path":"2023/08/21/考研/计算机/understandingBelady/","title":"从Belady现象看FIFO与LRU算法"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Belady、抖动及FIFO与LRU算法的对比 | MarkLee's Space</title>
+<title>从Belady现象看FIFO与LRU算法 | MarkLee's Space</title>
   
 
 
@@ -112,7 +114,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">案例</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">1.</span> <span class="nav-text">案例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text">子集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link"><span class="nav-number">3.</span> <span class="nav-text">序号与LRU</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -171,12 +173,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Belady、抖动及FIFO与LRU算法的对比 | MarkLee's Space">
+      <meta itemprop="name" content="从Belady现象看FIFO与LRU算法 | MarkLee's Space">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Belady、抖动及FIFO与LRU算法的对比
+          从Belady现象看FIFO与LRU算法
         </h1>
 
         <div class="post-meta-container">
@@ -194,7 +196,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-08-22 00:02:39" itemprop="dateModified" datetime="2023-08-22T00:02:39+08:00">2023-08-22</time>
+      <time title="Modified: 2023-08-22 22:22:54" itemprop="dateModified" datetime="2023-08-22T22:22:54+08:00">2023-08-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -222,7 +224,50 @@
     <div class="post-body" itemprop="articleBody"><blockquote>
 <p>Belady现象，或称Belady异常(Bélády’s anomaly)，指在使用先入先出(FIFO)的页替换算法时，为进程分配的页框增多，缺页率反而上升的异常现象，因其由匈牙利计算机科学家László Bélády最先发现，故得名。</p>
 </blockquote>
+<hr>
 <h1>案例</h1>
+<p><a target="_blank" rel="noopener" href="http://nob.cs.ucdavis.edu/classes/ecs150-2008-02/handouts/memory/mm-belady.pdf"><img src="/images/cs/belady.jpg" alt="Belady现象的案例" title="Belady案例"></a><br>
+上图对比了同一个页访问队列（[d, c, b, a, d, c, e, d, c, b, a, e]）在分配三个页框和四个页框的情况下，每个时刻的页框占用情况、缺页次数和页替换信息。可以看到，在情况A（即分配页框为3，下同）时，一共发生了9次缺页（page fault），而在情况B（分配页框为4，下同）的时候，缺页数则增加到了10次，出现了Belady现象，那么为什么会这样呢？</p>
+<p>不妨来回看一下每个时刻所对应的页框状况。从time0到time3，两种分配方式下的缺页次数是相同的。从time3到time6，对于情况A，缺页数递增，而对于情况B，缺页数保持不变，只在time6时增加了一次。从time7到time11，情况A下，只缺页了2次，而在情况B下，每次访问都要缺页，最终使得缺页数反超。因此不难看出，问题就出现在time3到time6期间。</p>
+<hr>
+<h1>子集</h1>
+<p>下表列出了从time3到time6，访问队列为[a, d, c, e]时，两种情况下页框内的页面组成。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>time3</th>
+<th>time4</th>
+<th>time5</th>
+<th>time6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w</td>
+<td>a</td>
+<td>d</td>
+<td>c</td>
+<td>e</td>
+</tr>
+<tr>
+<td>A</td>
+<td>acb</td>
+<td>adb</td>
+<td>adc</td>
+<td>edc</td>
+</tr>
+<tr>
+<td>B</td>
+<td>dcba</td>
+<td>dcba</td>
+<td>dcba</td>
+<td>ecba</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，从time3到time5，A中的页面集合始终是B中页面集合的子集。这就意味着，如果A中发生了缺页，那么B中不一定发生缺页，因为在A页面集合里没有的页面，可能在B的页面集合中存在，记B的缺页数为<em><strong>F(B)</strong></em>，A的缺页数为<em><strong>F(A)</strong></em>，则一定有<em><strong>F(B) &lt;= F(A)</strong></em>，案例中的time0到time5即对应这一情况。然而，在time6时，A页面集合不再是B页面集合的子集，这就意味着A和B的页面集合中存在各自独有的元素，也就无法判断一方缺页时，另一方会不会缺页。这样一来，一些特定的页访问序列会使得某一方缺页数更多，如该案例中的访问序列造成B的访问数更多，从而产生Belady异常。</p>
+<h1>序号与LRU</h1>
 
     </div>
 
