@@ -1095,6 +1095,7 @@ audio {
 }
 #b1,#b11 {
 	background-image: url('b1.png');
+	width:50px;
 }
 #b2,#b22 {
 	background-image: url('b2.png');
