@@ -1083,7 +1083,7 @@ audio {
 	width: 100px;
 	height: 183px;
 	background-repeat: no-repeat no-repeat;
-	background-size: 60%;
+	background-size: 50%;
 }
 .balloons h2 {
 	text-transform: uppercase;
@@ -1094,7 +1094,6 @@ audio {
 	display: none;
 }
 #b1,#b11 {
-	transform: scale(0.5);
 	background-image: url('b1.png');
 }
 #b2,#b22 {
